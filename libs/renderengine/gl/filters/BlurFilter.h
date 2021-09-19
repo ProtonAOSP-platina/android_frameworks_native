@@ -49,17 +49,14 @@ public:
     // Execute blur passes, rendering to offscreen texture.
     status_t prepare();
     // Render blur to the bound framebuffer (screen).
-    status_t render(size_t layers, int currentLayer);
+    status_t render(bool multiPass);
 
 private:
     uint32_t mRadius;
-    void drawMesh();
-    string getBlurVertShader() const;
-    string getBlurFragShader() const;
-    string getMixVertShader() const;
+    void drawMesh(GLuint uv, GLuint position);
+    string getVertexShader() const;
+    string getFragmentShader() const;
     string getMixFragShader() const;
-    string getDitherMixVertShader() const;
-    string getDitherMixFragShader() const;
 
     GLESRenderEngine& mEngine;
     // Frame buffer holding the composited background.
@@ -67,8 +64,6 @@ private:
     // Frame buffers holding the blur passes.
     GLFramebuffer mPingFbo;
     GLFramebuffer mPongFbo;
-    // Frame buffer holding the dither noise pattern.
-    GLFramebuffer mDitherFbo;
     uint32_t mDisplayWidth = 0;
     uint32_t mDisplayHeight = 0;
     uint32_t mDisplayX = 0;
@@ -76,19 +71,19 @@ private:
     // Buffer holding the final blur pass.
     GLFramebuffer* mLastDrawTarget;
 
+    // VBO containing vertex and uv data of a fullscreen triangle.
+    GLVertexBuffer mMeshBuffer;
+
     GenericProgram mMixProgram;
-    GLuint mMBlurOpacityLoc;
-    GLuint mMBlurTextureLoc;
+    GLuint mMPosLoc;
+    GLuint mMUvLoc;
+    GLuint mMMixLoc;
+    GLuint mMTextureLoc;
     GLuint mMCompositionTextureLoc;
 
-    GenericProgram mDitherMixProgram;
-    GLuint mDNoiseUvScaleLoc;
-    GLuint mDBlurOpacityLoc;
-    GLuint mDBlurTextureLoc;
-    GLuint mDDitherTextureLoc;
-    GLuint mDCompositionTextureLoc;
-
     GenericProgram mBlurProgram;
+    GLuint mBPosLoc;
+    GLuint mBUvLoc;
     GLuint mBTextureLoc;
     GLuint mBOffsetLoc;
 };
